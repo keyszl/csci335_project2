@@ -259,14 +259,14 @@ public class Checkerboard {
     public Set<Move> allCaptureMoves(PlayerColor player) {
         Set<Move> captureMoves = new LinkedHashSet<>();
         if (turnRepeating) {
-            addCaptureMoves(captureMoves, repeatingRow, repeatingCol);
+            addCaptureMoves(player, captureMoves, repeatingRow, repeatingCol);
 
         } else {
             for (int i = 0; i < numSquares; ++i) {
                 int row = getRow(i);
                 int col = getCol(i);
                 if (colorAt(row, col, player)) {
-                    addCaptureMoves(captureMoves, row, col);
+                    addCaptureMoves(player, captureMoves, row, col);
                 }
             }
         }
@@ -313,7 +313,7 @@ public class Checkerboard {
             return false;
         }
         Set<Move> captureMoves = new LinkedHashSet<>();
-        addCaptureMoves(captureMoves, row, col);
+        addCaptureMoves(getCurrentPlayer(), captureMoves, row, col);
         return (captureMoves.size() > 0);
     }
 
@@ -386,15 +386,15 @@ public class Checkerboard {
     }
 
     // Pre: captureMoves != null; legal (row, col); !noPieceAt (row, col)
-    // Post: All legal capture moves for this player at (row, col) are 
+    // Post: All legal capture moves for this player at (row, col) are
     //       added to captureMoves
-    private void addCaptureMoves(Set<Move> captureMoves, int row, int col) {
+    private void addCaptureMoves(PlayerColor player, Set<Move> captureMoves, int row, int col) {
         Set<Move> candidates = getCandidateCaptures(row, col);
         for (Move m : candidates) {
             int captureRow = getCaptureRow(m);
             int captureCol = getCaptureCol(m);
             if (legal(m.getEndRow(), m.getEndCol()) && pieceAt(m.getEndRow(), m.getEndCol()).isEmpty() &&
-                    pieceAt(captureRow, captureCol).filter(p -> p.getColor() != this.getCurrentPlayer()).isPresent()) {
+                    pieceAt(captureRow, captureCol).filter(p -> p.getColor() != player).isPresent()) {
                 captureMoves.add(m);
             }
         }
