@@ -6,9 +6,9 @@ import core.Duple;
 import java.util.Optional;
 import java.util.function.ToIntFunction;
 
-public class NegaMax extends CheckersSearcher {
+public class AlphaBeta extends CheckersSearcher {
     private int numNodes = 0;
-    public NegaMax(ToIntFunction<Checkerboard> e) {
+    public AlphaBeta(ToIntFunction<Checkerboard> e) {
         super(e);
     }
 
@@ -19,10 +19,10 @@ public class NegaMax extends CheckersSearcher {
 
     @Override
     public Optional<Duple<Integer, Move>> selectMove(Checkerboard board) {
-        return selectMoveHelp(board, 0);
+        return selectMoveHelp(board, 0, -Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 
-    private Optional<Duple<Integer, Move>> selectMoveHelp(Checkerboard board, int depth) {
+    private Optional<Duple<Integer, Move>> selectMoveHelp(Checkerboard board, int depth, int alpha, int beta) {
         // Algorithm goes here.
         // In particular, recursive calls look like:
         // Optional<Duple<Integer, Move>> recursiveResult = selectMoveHelp(someOtherBoard, depth + 1);
@@ -48,9 +48,13 @@ public class NegaMax extends CheckersSearcher {
         for (Checkerboard alternative: board.getNextBoards()) {
             numNodes += 1;
             int negation = board.getCurrentPlayer() != alternative.getCurrentPlayer() ? -1 : 1;
-            int scoreFor = negation * selectMoveHelp(alternative, depth+1).get().getFirst();
+            int scoreFor = negation * selectMoveHelp(alternative, depth+1, -beta, -alpha).get().getFirst();
             if (best.isEmpty() || best.get().getFirst() < scoreFor) {
                 best = Optional.of(new Duple<>(scoreFor, alternative.getLastMove()));
+                alpha = Math.max(alpha, scoreFor);
+            }
+            if(alpha >= beta){
+                return best;
             }
         }
         return best;
