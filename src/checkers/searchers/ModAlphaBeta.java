@@ -3,7 +3,10 @@ import checkers.core.Checkerboard;
 import checkers.core.CheckersSearcher;
 import checkers.core.Move;
 import core.Duple;
+
+import java.util.Comparator;
 import java.util.Optional;
+import java.util.PriorityQueue;
 import java.util.function.ToIntFunction;
 
 public class ModAlphaBeta extends CheckersSearcher {
@@ -45,7 +48,13 @@ public class ModAlphaBeta extends CheckersSearcher {
 
 
 
-        for (Checkerboard alternative: board.getNextBoards()) {
+        //ordering heuristic
+
+        PriorityQueue<Checkerboard> boards = new PriorityQueue<Checkerboard>(Comparator.comparingInt(b -> -1 * getEvaluator().applyAsInt(b)));
+
+        boards.addAll(board.getNextBoards());
+
+        for (Checkerboard alternative: boards) {
             numNodes += 1;
             int negation = board.getCurrentPlayer() != alternative.getCurrentPlayer() ? -1 : 1;
             int scoreFor = negation * selectMoveHelp(alternative, depth+1, -beta, -alpha).get().getFirst();
