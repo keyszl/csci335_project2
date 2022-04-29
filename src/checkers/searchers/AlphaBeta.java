@@ -47,8 +47,13 @@ public class AlphaBeta extends CheckersSearcher {
 
         for (Checkerboard alternative: board.getNextBoards()) {
             numNodes += 1;
+            int scoreFor;
             int negation = board.getCurrentPlayer() != alternative.getCurrentPlayer() ? -1 : 1;
-            int scoreFor = negation * selectMoveHelp(alternative, depth+1, -beta, -alpha).get().getFirst();
+            if (negation == -1){
+                scoreFor = negation * selectMoveHelp(alternative, depth+1, -beta, -alpha).get().getFirst();
+            } else {
+                scoreFor = negation * selectMoveHelp(alternative, depth + 1, alpha, beta).get().getFirst();
+            }
             if (best.isEmpty() || best.get().getFirst() < scoreFor) {
                 best = Optional.of(new Duple<>(scoreFor, alternative.getLastMove()));
                 alpha = Math.max(alpha, scoreFor);
